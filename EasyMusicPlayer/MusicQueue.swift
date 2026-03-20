@@ -1,0 +1,155 @@
+import Combine
+import Foundation
+@preconcurrency import MediaPlayer
+
+protocol MusicQueuable: AnyObject, Sendable {
+    //正在播放的歌曲
+    var currentTrack: MPMediaItem? { get }
+    //重复模式
+    var repeatMode: RepeatMode { get set }
+    //歌曲在库中的索引
+    var currentTrackIndex: Int { get }
+    //整个歌曲播放列表
+    var tracks: [MPMediaItem] { get }
+
+    func prime(_ track: MPMediaItem)
+    func track(for position: MusicQueueTrackPosition) -> MPMediaItem?
+    func load()
+    func create()
+    func hasUpdates() -> Bool
+    func toggleRepeatMode()
+}
+
+/// deals with figuring out what comes next
+/// also writes data to the user service (e.g. current track etc)
+final class MusicQueue: MusicQueuable {
+    var currentTrack: MPMediaItem? {
+        tracks[safe: currentTrackIndex]
+    }
+    var repeatMode: RepeatMode {
+        get { userService.repeatMode ?? .none }
+        set { userService.repeatMode = newValue }
+    }
+    private(set) var currentTrackIndex: Int {
+        get { _currentTrackIndex.withValue { $0 } }
+        set {
+            _currentTrackIndex.setValue(newValue)
+            userService.currentTrackID = currentTrack?.persistentID
+        }
+    }
+    private(set) var tracks: [MPMediaItem] {
+        get { _tracks.withValue { $0 } }
+        set {
+            _tracks.setValue(newValue)
+            userService.trackIDs = newValue.map { $0.persistentID }
+        }
+    }
+
+    private let musicLibrary: MusicLibraryable
+    private let userService: UserServicing
+    private let _tracks = LockIsolated<[MPMediaItem]>([])
+    private let _currentTrackIndex = LockIsolated<Int>(0)
+
+    init(
+        musicLibrary: MusicLibraryable = MusicLibrary(),
+        userService: UserServicing = UserService()
+    ) {
+        self.musicLibrary = musicLibrary
+        self.userService = userService
+    }
+
+    func prime(_ track: MPMediaItem) {
+        //将歌曲设置为当前播放项
+        currentTrackIndex = tracks.firstIndex(where: { $0.persistentID == track.persistentID }) ?? 0
+    }
+
+    func track(for position: MusicQueueTrackPosition) -> MPMediaItem? {
+        switch position {
+        case .current:
+            return currentTrack
+        case .next:
+            return cueNext()
+        case .previous:
+            return cuePrevious()
+        }
+    }
+
+    func load() {
+        //尝试加载用户保存的轨道ID列表
+        guard let trackIDs = userService.trackIDs, !trackIDs.isEmpty, musicLibrary.areTrackIDsValid(trackIDs) else {
+            create()
+            return
+        }
+        tracks = musicLibrary.findTracks(with: trackIDs)
+        guard let trackID = userService.currentTrackID, let track = musicLibrary.findTracks(with: [trackID]).first else {
+            return
+        }
+        prime(track)
+    }
+
+    func create() {
+        #if DEBUG
+        if __isSnapshot {
+            tracks = musicLibrary.makePlaylist(isShuffled: false)
+        } else {
+            tracks = musicLibrary.makePlaylist(isShuffled: true)
+        }
+        #else
+        tracks = musicLibrary.makePlaylist(isShuffled: true)
+        #endif
+        currentTrackIndex = 0
+    }
+
+    func hasUpdates() -> Bool {
+        !musicLibrary.areTrackIDsValid(tracks.map { $0.id })
+    }
+
+    func toggleRepeatMode() {
+        repeatMode.toggle()
+    }
+
+    private func cueNext() -> MPMediaItem? {
+        switch repeatMode {
+        //不重复播放，播放下一曲
+        case .none:
+            guard currentTrackIndex + 1 < tracks.endIndex else {
+                return nil
+            }
+            currentTrackIndex += 1
+            return currentTrack
+        //单曲循环
+        case .one:
+            return currentTrack
+        //列表循环
+        case .all:
+            guard currentTrackIndex + 1 < tracks.endIndex else {
+                currentTrackIndex = tracks.startIndex
+                return currentTrack
+            }
+            currentTrackIndex += 1
+            return currentTrack
+        }
+    }
+
+    private func cuePrevious() -> MPMediaItem? {
+        switch repeatMode {
+        //播完这一曲，直接播放上一曲
+        case .none:
+            guard currentTrackIndex - 1 >= tracks.startIndex else {
+                return nil
+            }
+            currentTrackIndex -= 1
+            return currentTrack
+        case .one:
+            return currentTrack
+        case .all:
+            guard currentTrackIndex - 1 >= tracks.startIndex else {
+                currentTrackIndex = tracks.endIndex - 1
+                return currentTrack
+            }
+            currentTrackIndex -= 1
+            return currentTrack
+        }
+    }
+}
+
