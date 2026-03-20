@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Bucket
+   uuid = "206AA713-0B88-4BFD-92DE-022D955A1403"
+   type = "1"
+   version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "4F94FDAB-293C-4342-BFFF-BF40FD1EC5BC"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "EasyMusicPlayer/LoginView/LoginViewModel.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "171"
+            endingLineNumber = "171"
+            landmarkName = "testRegister(username:password:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "D9CE983F-0E11-4928-9075-4D8F99CA67E6"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "EasyMusicPlayer/LoginView/LoginViewModel.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "150"
+            endingLineNumber = "150"
+            landmarkName = "testPing()"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "D9CE983F-0E11-4928-9075-4D8F99CA67E6 - cc6fc3939b2a283a"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "EasyMusicPlayer.LoginViewModel.testPing() async -&gt; Swift.Optional&lt;Swift.String&gt;"
+                  moduleName = "EasyMusicPlayer.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/haohaojiang0409/Code/MusicPlayerdemo/EasyMusicPlayer/EasyMusicPlayer/Code/EasyMusicPlayer/LoginView/LoginViewModel.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "150"
+                  endingLineNumber = "150">
+               </Location>
+               <Location
+                  uuid = "D9CE983F-0E11-4928-9075-4D8F99CA67E6 - fe8c9a60b3a5c7a6"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(1) suspend resume partial function for EasyMusicPlayer.LoginViewModel.testPing() async -&gt; Swift.Optional&lt;Swift.String&gt;"
+                  moduleName = "EasyMusicPlayer.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/haohaojiang0409/Code/MusicPlayerdemo/EasyMusicPlayer/EasyMusicPlayer/Code/EasyMusicPlayer/LoginView/LoginViewModel.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "150"
+                  endingLineNumber = "150">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
+</Bucket>
